@@ -20,16 +20,14 @@ router.beforeEach(async function(to, from, next) {
       store.getters.userId ? console.log('有用户id直接放行') : console.log('没有用户id，重新请求用户信息')
       if (!store.getters.userId) {
         // 如果没有用户ID， 重新调用Vuex获取资料的action
-        const result = await store.dispatch('user/getUserInfo')
-        console.log(result)
-        next()
+        const { roles } = await store.dispatch('user/getUserInfo')
         // roles.menus 是权限标识 它要去和路由模块做对应 进行筛选 筛选的得到的权限 进行addRoutes 并写入到vuex的state中
-        // const routes = await store.dispatch('permission/filterRoutes', roles.menus)
+        const routes = await store.dispatch('permission/filterRoutes', roles.menus)
         // routes就是该用户所拥有的动态路由数组
         // 将得到的动态路由添加到路由表中
-        // router.addRoutes([...routes, { path: '*', redirect: '/404', hidden: true }])
+        router.addRoutes([...routes, { path: '*', redirect: '/404', hidden: true }])
         // 如果进行了addRoutes 请用next(to.path) 否则会导致 刷新路由权限失效 这是一个已知缺陷
-        // next(to.path)
+        next(to.path)
       } else {
         // 如果拥有用户ID 就直接放行
         next()

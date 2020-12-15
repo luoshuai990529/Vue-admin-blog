@@ -2,6 +2,7 @@ import Layout from '@/layout'
 
 const edituserRouter = {
   path: '/edituser',
+  name: 'Edituser',
   component: Layout,
   children: [
     {

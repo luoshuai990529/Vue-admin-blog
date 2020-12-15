@@ -2,6 +2,7 @@ import Layout from '@/layout'
 
 const articleRouter = {
   path: '/article',
+  name: 'Article',
   component: Layout,
   children: [
     {

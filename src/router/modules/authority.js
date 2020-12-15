@@ -2,6 +2,7 @@ import Layout from '@/layout'
 
 const authorityRouter = {
   path: '/authority',
+  name: 'Authority',
   component: Layout,
   children: [
     {

@@ -23,9 +23,9 @@ const actions = {
     const routes = []
     menus.forEach(item => {
       //   item 就是一个标识
-      if (asyncRoutes.some(route => route.name === item)) {
+      if (asyncRoutes.some(route => route.path === item)) {
         //  这个认为找到了标识一样的路由
-        routes.push(...asyncRoutes.filter(route => route.name === item))
+        routes.push(...asyncRoutes.filter(route => route.path === item))
       }
     })
     // 执行到这里的时候 routes就已经是 和menus标识关联完成的路由了  routes相当于完成筛选之后的动态路由

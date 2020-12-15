@@ -2,6 +2,7 @@ import Layout from '@/layout'
 
 const commentRouter = {
   path: '/comment',
+  name: 'Comment',
   component: Layout,
   children: [
     {

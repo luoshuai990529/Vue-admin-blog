@@ -2,6 +2,7 @@ import Layout from '@/layout'
 
 const todoRouter = {
   path: '/todo',
+  name: 'Todo',
   component: Layout,
   children: [
     {

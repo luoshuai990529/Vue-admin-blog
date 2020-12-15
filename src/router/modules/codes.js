@@ -2,6 +2,7 @@ import Layout from '@/layout'
 
 const codesRouter = {
   path: '/codes',
+  name: 'Codes',
   component: Layout,
   children: [
     {

@@ -44,18 +44,20 @@ export const constantRoutes = [
       }
     ]
   },
-  articleRouter,
-  todoRouter,
-  authorityRouter,
-  codesRouter,
-  commentRouter,
-  edituserRouter
+  articleRouter // 引入文章模块的路由 因为该路由可以被所有人看到
+
   // 404 page must be placed at the end !!!
   // { path: '*', redirect: '/404', hidden: true }
 ]
 
 // 动态路由 将所有模块的路由都放入到了一个asyncRoutes里面的数组里了
-export const asyncRoutes = []
+export const asyncRoutes = [
+  todoRouter,
+  authorityRouter,
+  codesRouter,
+  commentRouter,
+  edituserRouter
+]
 
 const createRouter = () =>
   new Router({
