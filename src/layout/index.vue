@@ -1,11 +1,17 @@
 <template>
   <div :class="classObj" class="app-wrapper">
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
+    <!-- 左侧组件 -->
     <sidebar class="sidebar-container" />
     <div class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
+        <!-- 顶部组件 -->
         <navbar />
+
+        <!-- 放置一个多页签组件 -->
+        <tags-view />
       </div>
+      <!-- 主内容区  二级路由容器 -->
       <app-main />
     </div>
   </div>

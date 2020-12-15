@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">Register Form</h3>
       </div>
 
       <el-form-item prop="account">
@@ -11,10 +11,10 @@
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
+          ref="account"
           v-model="loginForm.account"
-          placeholder="Username"
-          name="username"
+          placeholder="Account"
+          name="account"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -40,8 +40,11 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
+      <div class="captcha-wrap">
+        <span class="captcha" @click="changeCaptcha" v-html="captchaContent" />
+        <span class="input-wrap"><span class="text">验证码：</span><input v-model="captchaText" type="text" class="captcha-input"></span>
+      </div>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">注册</el-button>
 
       <div class="tips">
         <span style="margin-right:20px;" />
@@ -52,22 +55,16 @@
   </div>
 </template>
 
-<script src="./index.js"></script>
-
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
+$bgq:#283443;
+$light_grayq:#fff;
+$cursorq: #fff;
 
-$bg:#283443;
-$light_gray:#fff;
-$cursor: #fff;
-
-@supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
+@supports (-webkit-mask: none) and (not (cater-color: $cursorq)) {
   .login-container .el-input input {
-    color: $cursor;
+    color: $cursorq;
   }
 }
-/* reset element-ui css */
 .login-container {
   .el-input {
     display: inline-block;
@@ -80,13 +77,13 @@ $cursor: #fff;
       -webkit-appearance: none;
       border-radius: 0px;
       padding: 12px 5px 12px 15px;
-      color: $light_gray;
+      color: $light_grayq;
       height: 47px;
-      caret-color: $cursor;
+      caret-color: $cursorq;
 
       &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
+        box-shadow: 0 0 0px 1000px $bgq inset !important;
+        -webkit-text-fill-color: $cursorq !important;
       }
     }
   }
@@ -99,4 +96,5 @@ $cursor: #fff;
   }
 }
 </style>
+<script src="./index.js"></script>
 <style lang="scss" scoped src="./index.scss"></style>
