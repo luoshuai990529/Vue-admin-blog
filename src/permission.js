@@ -21,6 +21,10 @@ router.beforeEach(async function(to, from, next) {
       if (!store.getters.userId) {
         // 如果没有用户ID， 重新调用Vuex获取资料的action
         const { roles } = await store.dispatch('user/getUserInfo')
+        if (!roles) {
+          // 如果roles没有 就直接跳转登录页
+          next('/login')
+        }
         // roles.menus 是权限标识 它要去和路由模块做对应 进行筛选 筛选的得到的权限 进行addRoutes 并写入到vuex的state中
         const routes = await store.dispatch('permission/filterRoutes', roles.menus)
         // routes就是该用户所拥有的动态路由数组

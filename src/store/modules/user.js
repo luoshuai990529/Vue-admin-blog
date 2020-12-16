@@ -1,7 +1,9 @@
 import { getToken, setToken, removeToken, setTimeStamp } from '@/utils/auth'
 // 引入login 方法
 import { login, getUserInfo } from '@/api/user'
+import { Message } from 'element-ui'
 import { resetRouter } from '@/router'
+import router from '@/router'
 // 状态
 // 初始化的时候从缓存中读取状态 并赋值到初始化的状态上
 // Vuex的持久化 如何实现 ？ Vuex和前端缓存相结合
@@ -37,6 +39,13 @@ const actions = {
   // async 标记的函数其实就是一个异步函数 -> 本质是还是 一个promise
   async login(context, data) {
     const result = await login(data) // 实际上就是一个promise  result就是执行的结果
+    if (result.code === 403) {
+      // 如果返回的状态码是403说明该用户被冻结
+      Message.error(result.message)
+      return
+    } else {
+      Message.success(result.message)
+    }
     // actions 修改state 必须通过mutations
     // 设置token 到vuex
     context.commit('setToken', result.data.token)
@@ -46,6 +55,20 @@ const actions = {
   // 获取用户资料的action
   async getUserInfo(context) {
     const result = await getUserInfo() // result就是用户的基本资料
+    console.log('获取用户的信息：', result)
+    if (result.code === 403) {
+      Message.error(result.message)
+      // 删除token
+      context.commit('removeToken') // 不仅仅删除了vuex中的 还删除了缓存中的
+      // 删除用户信息
+      context.commit('removeUserInfo')
+      router.push('/')
+      return
+      // 重置路由
+      // resetRouter()
+      // context.commit('permission/setRoutes', [], { root: true })
+      // return false
+    }
     // const baseInfo = await getUserDetailById(result.userId) // 为了获取头像
     // const baseResult = { ...result, ...baseInfo } // 将两个接口结果合并
     // 此时已经获取到了用户的基本资料 迫不得已 为了头像再次调用一个接口
