@@ -13,6 +13,8 @@ import authorityRouter from './modules/authority'
 import codesRouter from './modules/codes'
 import commentRouter from './modules/comment'
 import edituserRouter from './modules/edituser'
+import approvalRouter from './modules/approval'
+
 // constantRoutes 静态路由
 export const constantRoutes = [
   {
@@ -43,8 +45,7 @@ export const constantRoutes = [
         meta: { title: '首页', icon: 'dashboard' }
       }
     ]
-  },
-  articleRouter // 引入文章模块的路由 因为该路由可以被所有人看到
+  }
 
   // 404 page must be placed at the end !!!
   // { path: '*', redirect: '/404', hidden: true }
@@ -56,7 +57,9 @@ export const asyncRoutes = [
   authorityRouter,
   codesRouter,
   commentRouter,
-  edituserRouter
+  edituserRouter,
+  articleRouter,
+  approvalRouter
 ]
 
 const createRouter = () =>
