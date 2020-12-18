@@ -38,7 +38,7 @@
           >
             <el-dropdown-item>编辑资料</el-dropdown-item>
           </router-link>
-          <el-dropdown-item divided @click.native="lgout">
+          <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">退出登录</span>
           </el-dropdown-item>
         </el-dropdown-menu>
@@ -65,7 +65,7 @@ export default {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
-    async lgout() {
+    async logout() {
       this.$store.dispatch('user/logout')
       this.$router.push('/login') // 回到登录页
     }

@@ -30,7 +30,7 @@ service.interceptors.request.use((config) => {
     if (CheckTimeOut()) {
       // 如果进来，表示差距已经大于7200秒了
       // 调用登出的action
-      store.dispatch('user/lgout') // 调用登出的action
+      store.dispatch('user/logout') // 调用登出的action
       router.push('/login') // 回到登录页
       return Promise.reject(new Error('token超时了')) // 为了阻止继续往下走 要返回一个promise的reject
     }
