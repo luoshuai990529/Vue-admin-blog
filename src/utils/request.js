@@ -56,14 +56,14 @@ service.interceptors.response.use(response => {
     //  如果成功 表示业务执行成功 直接返回data
     return response.data
   } else {
-    // 如果返回的状态码为401 代表身份验证错误  回到登录页
+    // 如果返回的状态码为401 代表token身份验证错误  回到登录页
     if (response.data.code === 401) {
       Message.error(message) // 先提示错误
       store.dispatch('user/logout') // 调用登出的action
       router.push('/login') // 回到登录页
       return Promise.reject(new Error(message))
     }
-    // 表示没有执行成功先弹出错误消息 再reject
+    // 表示没有执行成功先弹出错误消息 再reject 如403等用户冻结信息
     Message.error(message) // 先提示错误
     return Promise.reject(new Error(message))
   }

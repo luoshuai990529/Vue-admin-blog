@@ -1,9 +1,9 @@
 <template>
   <div>
-    <el-card class="card-content">
+    <el-card v-loading="isLoadingTable" class="card-content">
       <div slot="header" class="clearfix">
         <span>角色列表</span>
-        <el-button style="float: right" type="primary" size="small" @click="addRoles">新增角色</el-button>
+        <el-button style="float: right" type="primary" size="small" @click="addRolesHandle">新增角色</el-button>
       </div>
       <!-- 角色列表table -->
       <el-table
@@ -12,7 +12,7 @@
         style="width: 100%"
       >
         <el-table-column
-          prop="rolename"
+          prop="role_name"
           align="center"
           label="角色昵称"
           width="200"
@@ -56,43 +56,44 @@
           />
         </el-form-item>
         <el-form-item label="路由权限">
-          <el-checkbox-group v-model="checkedRouterMenu" @change="handleCheckedCitiesChange">
-            <el-checkbox v-for="city in routerMenu" :key="city" :label="city">{{ city }}</el-checkbox>
+          <el-checkbox-group v-model="checkedRouterMenu" @change="routerCheckHandle">
+            <el-checkbox v-for="item in routerMenus" :key="item.id" :label="item.id">{{ item.name }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="接口权限">
-          <el-checkbox-group v-model="checkedApiMenu" @change="handleCheckedCitiesChange">
-            <el-checkbox v-for="city in apiMenu" :key="city" :label="city">{{ city }}</el-checkbox>
+          <el-checkbox-group v-model="checkedApiMenu" @change="actionCheckHandle">
+            <el-checkbox v-for="item in apiMenus" :key="item.id" :label="item.id">{{ item.name }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="addRolesDialog = false">取 消</el-button>
+        <el-button type="primary" @click="sureAddRole">确 定</el-button>
       </div>
     </el-dialog>
     <!-- 编辑弹框 -->
-    <el-dialog title="角色当前权限" :visible.sync="dialogFormVisible">
+    <el-dialog title="角色当前权限" :visible.sync="editRolesDialog">
       <div class="router-menus">
         <p>路由菜单：</p>
-        <el-checkbox-group v-model="checkedRouterMenu" @change="handleCheckedCitiesChange">
-          <el-checkbox v-for="city in routerMenu" :key="city" :label="city">{{ city }}</el-checkbox>
+        <el-checkbox-group v-model="checkedRouterMenu" @change="routerCheckHandle">
+          <el-checkbox v-for="item in routerMenus" :key="item.id" :label="item.id">{{ item.name }}</el-checkbox>
         </el-checkbox-group>
       </div>
       <div class="api-menus" />
       <p>api权限：</p>
-      <el-checkbox-group v-model="checkedApiMenu" @change="handleCheckedCitiesChange">
-        <el-checkbox v-for="city in apiMenu" :key="city" :label="city">{{ city }}</el-checkbox>
+      <el-checkbox-group v-model="checkedApiMenu" @change="actionCheckHandle">
+        <el-checkbox v-for="item in apiMenus" :key="item.id" :label="item.id">{{ item.name }}</el-checkbox>
       </el-checkbox-group>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="editRolesDialog = false">取 消</el-button>
+        <el-button type="primary" @click="editRolesDialog = false">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { getRoleList, getRights, addRole } from '@/api/auth'
 export default {
   data() {
     return {
@@ -101,24 +102,10 @@ export default {
         size: 5
       },
       totalCount: 0,
-      tableData: [{
-        rolename: '超级管理员',
-        description: '所有权限',
-        create_time: '2020-12-18'
-      }, {
-        rolename: '普通管理员',
-        description: '部分权限',
-        create_time: '2020-12-18'
-      }, {
-        rolename: '游客',
-        description: '没有权限',
-        create_time: '2020-12-18'
-      }],
-      routerMenu: [
-        '文章管理', '审批管理', '权限管理', '作品管理', '评论管理', '待办管理'
+      tableData: [],
+      routerMenus: [
       ],
-      apiMenu: [
-        'approval-pass', 'approval-no'
+      apiMenus: [
       ],
       checkedApiMenu: [],
       checkedRouterMenu: [],
@@ -126,17 +113,51 @@ export default {
         name: '',
         desc: ''
       },
-      dialogFormVisible: false,
-      addRolesDialog: false
+      editRolesDialog: false,
+      addRolesDialog: false,
+      isLoadingTable: false
     }
   },
-
+  mounted() {
+    this.initRolesData()
+    this.initRightData()
+  },
   methods: {
-    addRoles() {
+    async initRolesData() {
+      this.isLoadingTable = true
+      const result = await getRoleList()
+      this.tableData = result.data
+      this.isLoadingTable = false
+    },
+    async initRightData() {
+      const result = await getRights()
+      this.routerMenus = result.data.menus
+      this.apiMenus = result.data.actions
+    },
+    addRolesHandle() {
       this.addRolesDialog = true
+      //   初始化数据
+      this.addRolesData.name = ''
+      this.addRolesData.desc = ''
+      this.checkedApiMenu = []
+      this.checkedRouterMenu = []
+    },
+    async sureAddRole() {
+      try {
+        const data = { ...this.addRolesData, rights: [...this.checkedRouterMenu, ...this.checkedApiMenu] }
+        const result = await addRole(data)
+        this.$message({
+          type: 'success',
+          message: result.message
+        })
+        this.addRolesDialog = false
+        this.initRolesData()
+      } catch (error) {
+        this.isLoadingTable = false
+      }
     },
     editHandle(val) {
-      this.dialogFormVisible = true
+      this.editRolesDialog = true
     },
     deleteHandle(val) {
       console.log(val)
@@ -152,18 +173,17 @@ export default {
       this.pageInfo.current = n
       //   翻页 重新请求数据
     },
-    handleCheckedCitiesChange(value) {
-      console.log(value)
+
+    routerCheckHandle(val) {
+      console.log('路由菜单选择', val)
+    },
+    actionCheckHandle(val) {
+      console.log('接口权限选择', val)
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.card-content{
 
-    .dialog-addroles{
-
-    }
-}
 </style>

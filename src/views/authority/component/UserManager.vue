@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card class="card-content">
+    <el-card v-loading="isLoadingTable" class="card-content">
       <el-table
         :data="tableData"
         border
@@ -21,10 +21,10 @@
         <el-table-column
           align="center"
           label="角色"
-          width="160"
+          min-width="160"
         >
           <template slot-scope="scope">
-            <el-tag v-for="item in scope.row.roles" :key="item" class="role-tag">{{ item }}</el-tag>
+            <el-tag class="role-tag">{{ scope.row.role_name }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column
@@ -38,7 +38,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="state"
+          prop="stateDesc"
           align="center"
           label="状态"
           width="100"
@@ -51,7 +51,8 @@
         >
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="editHandle(scope.row)">编辑</el-button>
-            <el-button type="text" size="small" @click="freezeHandle(scope.row)">冻结</el-button>
+            <el-button v-if="scope.row.state==1" type="text" size="small" @click="freezeHandle(scope.row)">冻结</el-button>
+            <el-button v-if="scope.row.state==0" type="text" size="small" @click="activeHandle(scope.row)">激活</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -70,23 +71,32 @@
     </el-card>
     <!-- 编辑弹框 -->
     <el-dialog title="用户当前角色" :visible.sync="dialogFormVisible">
-      <el-radio-group v-model="radio">
-        <el-radio v-for="item in userRoles" :key="item.code" :label="item.code">{{ item.desc }}</el-radio>
+      <el-radio-group v-model="currentRole">
+        <el-radio v-for="item in userRoles" :key="item.id" :label="item.id">{{ item.role_name }}</el-radio>
       </el-radio-group>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="confirmEdit">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import img1 from '@/assets/1.jpeg'
+import { getAuthList, editUserAuth, freezeUser, activeUser } from '@/api/auth'
+// import img1 from '@/assets/1.jpeg'
 // import img2 from '@/assets/2.jpeg'
-import img3 from '@/assets/3.jpeg'
-import img4 from '@/assets/4.jpeg'
+// import img3 from '@/assets/3.jpeg'
+// import img4 from '@/assets/4.jpeg'
 export default {
+  props: {
+    rolesList: {
+      type: Array,
+      default: () => {
+        return []
+      }
+    }
+  },
   data() {
     return {
       pageInfo: {
@@ -94,50 +104,93 @@ export default {
         size: 5
       },
       totalCount: 0,
-      tableData: [{
-        username: '黎明',
-        account: '10086',
-        icon: img1,
-        state: '正常',
-        roles: ['超级管理员']
-      }, {
-        username: '花火',
-        account: '10086',
-        icon: '',
-        state: '正常',
-        roles: ['普通管理员']
-      }, {
-        username: '子然',
-        account: '10086',
-        icon: img3,
-        state: '正常',
-        roles: ['游客']
-      }, {
-        username: '秋秋',
-        account: '10086',
-        icon: img4,
-        state: '正常',
-        roles: ['游客']
-      }],
-      userRoles: [
-        { code: 0, desc: '超级管理员' },
-        { code: 1, desc: '普通管理员' },
-        { code: 2, desc: '游客' }
-      ],
-      radio: 0,
-      dialogFormVisible: false
+      tableData: [],
+      userRoles: [],
+      currentRole: 0,
+      editUser: 0,
+      dialogFormVisible: false,
+      isLoadingTable: false
     }
   },
-
+  watch: {
+    rolesList: {
+      handler(val) {
+        this.userRoles = val
+      },
+      deep: true
+    }
+  },
+  mounted() {
+    this.initUserData()
+  },
   methods: {
-    editHandle(val) {
-      this.dialogFormVisible = true
+    async initUserData() {
+      this.isLoadingTable = true
+      const res = await getAuthList(this.pageInfo)
+      this.totalCount = res.data.totalCount
+      this.tableData = res.data.list
+      this.isLoadingTable = false
     },
-    freezeHandle(val) {
-      console.log(val)
+    async editHandle({ rid, uid }) {
+      this.dialogFormVisible = true
+      this.currentRole = rid
+      this.editUser = uid
+    },
+    async freezeHandle({ uid }) {
+      this.isLoadingTable = true
+      const result = await freezeUser(uid)
+      if (result.success === 'ok') {
+        this.$message({
+          type: 'warning',
+          message: result.message
+        })
+        this.initUserData()
+      } else {
+        this.$message({
+          type: 'success',
+          message: result.message
+        })
+        this.isLoadingTable = false
+      }
+    },
+    async activeHandle({ uid }) {
+      this.isLoadingTable = true
+      const result = await activeUser(uid)
+      if (result.success === 'ok') {
+        this.$message({
+          type: 'success',
+          message: result.message
+        })
+        this.initUserData()
+      } else {
+        this.$message({
+          type: 'success',
+          message: result.message
+        })
+        this.isLoadingTable = false
+      }
+    },
+    async confirmEdit() {
+    // 发送请求编辑用户当前角色
+      const data = { uid: this.editUser, rid: this.currentRole }
+      const result = await editUserAuth(data)
+      if (result.success === 'ok') {
+        this.$message({
+          type: 'success',
+          message: '编辑成功!'
+        })
+        this.initUserData()
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '编辑失败!'
+        })
+      }
+      this.dialogFormVisible = false
     },
     handleSizeChange(val) {
       this.pageInfo.size = val
+      this.initUserData()
       //   页码改变,重新请求数据
     },
     updatePages(n) {
@@ -146,6 +199,7 @@ export default {
       }
       this.pageInfo.current = n
       //   翻页 重新请求数据
+      this.initUserData()
     }
   }
 }
