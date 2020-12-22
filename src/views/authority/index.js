@@ -22,6 +22,7 @@ export default {
     },
     async initRolesData() {
       const result = await getRoleList()
+      console.log(result.data)
       this.rolesList = result.data
     }
   }

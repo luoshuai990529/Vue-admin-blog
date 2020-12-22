@@ -73,6 +73,19 @@
     </el-dialog>
     <!-- 编辑弹框 -->
     <el-dialog title="角色当前权限" :visible.sync="editRolesDialog">
+      <el-form :label-position="'left'" label-width="100px" :model="addRolesData">
+        <el-form-item label="角色名称">
+          <el-input v-model="addRolesData.name" placeholder="请输入角色名称" show-word-limit maxlength="10" width="150px" />
+        </el-form-item>
+        <el-form-item label="角色描述">
+          <el-input
+            v-model="addRolesData.desc"
+            placeholder="请输入该角色描述"
+            maxlength="30"
+            show-word-limit
+          />
+        </el-form-item>
+      </el-form>
       <div class="router-menus">
         <p>路由菜单：</p>
         <el-checkbox-group v-model="checkedRouterMenu" @change="routerCheckHandle">
@@ -86,14 +99,14 @@
       </el-checkbox-group>
       <div slot="footer" class="dialog-footer">
         <el-button @click="editRolesDialog = false">取 消</el-button>
-        <el-button type="primary" @click="editRolesDialog = false">确 定</el-button>
+        <el-button type="primary" @click="sureEditRole">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getRoleList, getRights, addRole } from '@/api/auth'
+import { getRoleList, getRights, addRole, deleteRole, getRoleInfo, editRole } from '@/api/auth'
 export default {
   data() {
     return {
@@ -113,6 +126,7 @@ export default {
         name: '',
         desc: ''
       },
+      currentEditId: '',
       editRolesDialog: false,
       addRolesDialog: false,
       isLoadingTable: false
@@ -156,11 +170,52 @@ export default {
         this.isLoadingTable = false
       }
     },
-    editHandle(val) {
-      this.editRolesDialog = true
+    async sureEditRole() {
+      try {
+        const data = { id: this.currentEditId, ...this.addRolesData, rights: [...this.checkedRouterMenu, ...this.checkedApiMenu] }
+        console.log(data)
+        const result = await editRole(data)
+        this.$message({
+          type: 'success',
+          message: result.message
+        })
+        this.editRolesDialog = false
+        this.initRolesData()
+      } catch (error) {
+        this.isLoadingTable = false
+      }
     },
-    deleteHandle(val) {
-      console.log(val)
+    async editHandle({ id }) {
+      this.currentEditId = id
+      this.editRolesDialog = true
+      // 1.点击编辑先查询编辑的角色所拥有的权限信息 数据回显
+      const result = await getRoleInfo(id)
+      const { rolename, desc, routerRights, actionRights } = result.data
+      this.addRolesData.name = rolename
+      this.addRolesData.desc = desc
+      this.checkedApiMenu = actionRights
+      this.checkedRouterMenu = routerRights
+    },
+    async deleteHandle({ id }) {
+      this.$confirm('你确定要删除该角色吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        const result = await deleteRole(id)
+        if (result.code === 200) {
+          this.$message({
+            type: 'success',
+            message: result.message
+          })
+          this.initRolesData()
+        } else {
+          this.$message({
+            type: 'warning',
+            message: result.message
+          })
+        }
+      })
     },
     handleSizeChange(val) {
       this.pageInfo.size = val

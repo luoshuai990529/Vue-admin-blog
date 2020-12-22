@@ -61,3 +61,27 @@ export function addRole(data) {
     data
   })
 }
+
+export function deleteRole(id) {
+  return request({
+    url: '/auth/delete',
+    method: 'post',
+    data: { id }
+  })
+}
+
+export function getRoleInfo(id) {
+  return request({
+    url: '/auth/getRoleInfo',
+    method: 'get',
+    params: { id }
+  })
+}
+
+export function editRole(data) {
+  return request({
+    url: '/auth/editRole',
+    method: 'post',
+    data
+  })
+}

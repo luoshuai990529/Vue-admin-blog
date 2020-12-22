@@ -116,6 +116,7 @@ export default {
     rolesList: {
       handler(val) {
         this.userRoles = val
+        this.initUserData()
       },
       deep: true
     }
