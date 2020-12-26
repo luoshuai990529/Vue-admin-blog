@@ -165,7 +165,7 @@ export default {
     revocatHandle() {},
     commitHandle() {
       this.commitDialog = true
-      console.log(this.currentTodo)
+      console.log('当前提交的todo标识：', this.currentTodo)
     },
     sureAddEvent() {}
   }

@@ -51,10 +51,27 @@ export default {
         { id: 1, priority: '3', description: '练会无题', open: '1', openDesc: '是', tags: '生活', complete: '0' }
       ],
       uncommits: [
-        { id: 1, start_time: '2020-12-01', end_time: '2020-12-30', data_type: '2', commit: '0' },
-        { id: 8, start_time: '2020-11-01', end_time: '2020-11-31', data_type: '2', commit: '0' },
-        { id: 12, start_time: '2020-12-25', end_time: '2020-12-25', data_type: '0', commit: '0' },
-        { id: 5, start_time: '2020-12-21', end_time: '2020-12-27', data_type: '1', commit: '0' }
+        { id: 1, start_time: '2020-12-01', end_time: '2020-12-30', data_type: '2', commit: '0',
+          eventList: [
+            { id: 1, priority: '2', description: '学完typescript', open: '1', openDesc: '是', tags: '学习', complete: '0' },
+            { id: 2, priority: '2', description: '学完flutter', open: '1', openDesc: '是', tags: '学习', complete: '1' },
+            { id: 3, priority: '2', description: '学完react-native', open: '1', openDesc: '是', tags: '学习', complete: '1' }
+          ] },
+        { id: 12, start_time: '2020-12-25', end_time: '2020-12-25', data_type: '0', commit: '0',
+          eventList: [
+            { id: 1, priority: '2', description: '跑步5km', open: '1', openDesc: '是', tags: '学习', complete: '0' },
+            { id: 2, priority: '2', description: '做100个深蹲', open: '1', openDesc: '是', tags: '学习', complete: '1' }
+          ] },
+        { id: 5, start_time: '2020-12-21', end_time: '2020-12-27', data_type: '1', commit: '0',
+          eventList: [
+            { id: 1, priority: '2', description: '看完一章节的书', open: '1', openDesc: '是', tags: '学习', complete: '1' }
+          ] },
+        { id: 6, start_time: '2020-01-01', end_time: '2020-12-31', data_type: '3', commit: '0',
+          eventList: [
+            { id: 1, priority: '2', description: '学会吉他无题弹奏', open: '1', openDesc: '是', tags: '学习', complete: '0' },
+            { id: 2, priority: '2', description: '瘦到150斤', open: '1', openDesc: '是', tags: '学习', complete: '1' },
+            { id: 3, priority: '2', description: '存款10w', open: '1', openDesc: '是', tags: '学习', complete: '0' }
+          ] }
       ]
     }
   },
