@@ -33,6 +33,13 @@
             <el-radio :label="0">否</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="优先级">
+          <el-radio-group v-model="addTodoData.priority">
+            <el-radio :label="1">高</el-radio>
+            <el-radio :label="2">中</el-radio>
+            <el-radio :label="3">低</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="标签">
           <el-input
             v-model="addTodoData.tags"
@@ -51,6 +58,7 @@
 </template>
 
 <script>
+import { createEvent } from '@/api/todo'
 import { parseTime } from '@/utils/index'
 import TodoTabs from './components/TodoTabs.vue'
 export default {
@@ -65,6 +73,7 @@ export default {
         todoType: 0,
         description: '',
         open: 1,
+        priority: 1,
         tags: ''
       }
     }
@@ -73,8 +82,15 @@ export default {
     addNewTodo() {
       this.addNewDialog = true
     },
-    sureAddEvent() {
-
+    async sureAddEvent() {
+      this.addNewDialog = false
+      const result = await createEvent(this.addTodoData)
+      if (result.code === 200) {
+        this.$message({
+          message: result.message,
+          type: 'success'
+        })
+      }
     }
   }
 }

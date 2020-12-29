@@ -9,7 +9,7 @@
         <navbar />
 
         <!-- 放置一个多页签组件 -->
-        <tags-view />
+        <!-- <tags-view /> -->
       </div>
       <!-- 主内容区  二级路由容器 -->
       <app-main />

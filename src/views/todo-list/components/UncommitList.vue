@@ -3,9 +3,11 @@
     <el-collapse v-model="activeNames" accordion @change="handleChange">
       <el-collapse-item v-for="(item) of uncommitData" :key="item.id" :name="item.id">
         <template slot="title">
-          {{ item.start_time }} 至 {{ item.end_time }} <el-tag effect="dark" size="mini" :type="getTagsType(item.data_type)" style="margin-left:20px">{{ formatTitle(item.data_type) }}</el-tag>
+          {{ item.start_time }} 至 {{ item.end_time }} <el-tag effect="dark" size="mini" :type="getTagsType(item.date_type)" style="margin-left:20px">{{ formatTitle(item.date_type) }}</el-tag>
         </template>
-        <TabsList :current-todo="item.id" :table-data="item.eventList" />
+        <div v-if="item.list.length>0">
+          <TabsList :current-todo="item.id" :table-data="item.list" />
+        </div>
       </el-collapse-item>
     </el-collapse>
   </div>
@@ -13,12 +15,14 @@
 
 <script>
 import TabsList from './TabsList.vue'
+import { parseTime } from '@/utils/index'
 export default {
+  name: 'UncommitList',
   components: {
     TabsList
   },
   props: {
-    tableData: {
+    unCommitData: {
       type: Array,
       default: () => {
         return []
@@ -27,6 +31,7 @@ export default {
   },
   data() {
     return {
+      count: 0,
       currentCommit: 0,
       activeNames: ['1'],
       uncommitData: []
@@ -36,15 +41,16 @@ export default {
 
   },
   watch: {
-    tableData: {
+    unCommitData: {
       handler(val) {
+        this.uncommitData = val.map(item => {
+          item.start_time = parseTime(new Date(item.start_time).getTime(), '{y}-{m}-{d}')
+          item.end_time = parseTime(new Date(item.end_time).getTime(), '{y}-{m}-{d}')
+          return item
+        })
       },
       deep: true
     }
-  },
-  mounted() {
-    this.uncommitData = this.tableData
-    console.log(...this.uncommitData)
   },
   methods: {
     handleChange(val) {

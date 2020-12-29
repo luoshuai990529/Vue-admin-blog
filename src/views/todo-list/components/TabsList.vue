@@ -3,10 +3,11 @@
     <div class="clearfix">
       <el-button type="primary" size="small" style="float:right" @click="commitHandle">提交待办</el-button>
     </div>
+    <!-- 进行中的事件 -->
     <div class="pending">
       <h5 class="pending-text">进行中：</h5>
       <el-table
-        :data="pendingTableData"
+        :data="getPendingData"
         border
         empty-text="暂无进行待办事项"
         style="width: 100%"
@@ -46,10 +47,11 @@
         </el-table-column>
       </el-table>
     </div>
+    <!-- 已完成的事件 -->
     <div class="complete">
       <h5 class="complete-text">已完成：</h5>
       <el-table
-        :data="completeTableData"
+        :data="getCompleteData"
         border
         empty-text="暂无完成待办事项"
         style="width: 100%"
@@ -137,8 +139,7 @@ export default {
   },
   data() {
     return {
-      completeTableData: [],
-      pendingTableData: [],
+      allTableData: [],
       commitDialog: false,
       addTodoData: {
         remarks: '',
@@ -146,18 +147,21 @@ export default {
       }
     }
   },
-  watch: {
-    tableData: {
-      handler(val) {
-        console.log(val)
-      },
-      deep: true
+  computed: {
+    getCompleteData() {
+      const completeArr = []
+      this.tableData.forEach(item => {
+        item.complete === '1' ? completeArr.push(item) : ''
+      })
+      return completeArr
+    },
+    getPendingData() {
+      const pendingArr = []
+      this.tableData.forEach(item => {
+        item.complete === '1' ? '' : pendingArr.push(item)
+      })
+      return pendingArr
     }
-  },
-  mounted() {
-    this.tableData.forEach(item => {
-      item.complete === '1' ? this.completeTableData.push(item) : this.pendingTableData.push(item)
-    })
   },
   methods: {
     completeHandle() {},
