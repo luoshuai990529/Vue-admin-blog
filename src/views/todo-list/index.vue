@@ -7,7 +7,7 @@
       </div>
     </el-card>
     <!-- 待办tab栏 -->
-    <TodoTabs />
+    <TodoTabs ref="todoRef" />
     <!-- 新增待办弹出框 -->
     <el-dialog title="新增待办事项" :visible.sync="addNewDialog">
       <el-form :label-position="'left'" label-width="100px" :model="addTodoData">
@@ -80,6 +80,8 @@ export default {
   },
   methods: {
     addNewTodo() {
+      this.addTodoData.description = ''
+      this.addTodoData.tags = ''
       this.addNewDialog = true
     },
     async sureAddEvent() {
@@ -90,6 +92,7 @@ export default {
           message: result.message,
           type: 'success'
         })
+        this.$refs.todoRef.initEventData()
       }
     }
   }

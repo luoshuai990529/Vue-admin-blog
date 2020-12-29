@@ -42,7 +42,7 @@
         >
           <template slot-scope="scope">
             <el-button type="success" size="mini" @click="completeHandle(scope.row)">完成</el-button>
-            <el-button type="danger" size="mini" @click="deleteHandle(scope.row)">删除</el-button>
+            <el-button v-if="hidebtn" type="danger" size="mini" @click="deleteHandle(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -123,6 +123,7 @@
 </template>
 
 <script>
+import { completeEvent, cancleEvent, deleteEvent } from '@/api/todo'
 export default {
   name: 'TabsList',
   props: {
@@ -135,6 +136,10 @@ export default {
     currentTodo: {
       type: Number,
       default: 0
+    },
+    hidebtn: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -164,14 +169,37 @@ export default {
     }
   },
   methods: {
-    completeHandle() {},
-    deleteHandle() {},
-    revocatHandle() {},
+    async completeHandle({ id }) {
+      const result = await completeEvent(id)
+      this.successHandle(result.message)
+    },
+    async deleteHandle({ id }) {
+      this.$confirm('你确定要删除此条待办吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        const result = await deleteEvent(id)
+        this.successHandle(result.message)
+      })
+    },
+    async revocatHandle({ id }) {
+      const result = await cancleEvent(id)
+      this.successHandle(result.message)
+    },
     commitHandle() {
       this.commitDialog = true
       console.log('当前提交的todo标识：', this.currentTodo)
     },
-    sureAddEvent() {}
+    sureAddEvent() {},
+    successHandle(message) {
+      this.$message({
+        type: 'success',
+        message: message
+      })
+      this.$emit('successHandle')
+    }
+
   }
 }
 </script>

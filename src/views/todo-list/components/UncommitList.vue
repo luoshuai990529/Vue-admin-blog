@@ -6,7 +6,7 @@
           {{ item.start_time }} 至 {{ item.end_time }} <el-tag effect="dark" size="mini" :type="getTagsType(item.date_type)" style="margin-left:20px">{{ formatTitle(item.date_type) }}</el-tag>
         </template>
         <div v-if="item.list.length>0">
-          <TabsList :current-todo="item.id" :table-data="item.list" />
+          <TabsList :hidebtn="false" :current-todo="item.id" :table-data="item.list" @successHandle="successHandle" />
         </div>
       </el-collapse-item>
     </el-collapse>
@@ -56,6 +56,10 @@ export default {
     handleChange(val) {
       this.currentCommit = val
       // console.log(this.currentCommit)
+    },
+    successHandle() {
+      // 执行父组件的方法重新请求数据
+      this.$emit('successHandle')
     },
     formatTitle(key) {
       switch (key) {

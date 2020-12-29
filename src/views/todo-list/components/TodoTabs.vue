@@ -3,19 +3,19 @@
     <el-card class="tabs-card">
       <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
         <el-tab-pane label="今日待办" name="daylist"> <span slot="label">今日待办({{ dayCompNum }}/{{ dayList.length }})</span>
-          <TabsList :current-todo="0" :table-data="dayList" />
+          <TabsList :current-todo="0" :table-data="dayList" @successHandle="initEventList" />
         </el-tab-pane>
         <el-tab-pane label="本周待办" name="weeklist"> <span slot="label">本周待办({{ weekCompNum }}/{{ weekList.length }})</span>
-          <TabsList :current-todo="1" :table-data="weekList" />
+          <TabsList :current-todo="1" :table-data="weekList" @successHandle="initEventList" />
         </el-tab-pane>
         <el-tab-pane label="本月待办" name="monthlist"> <span slot="label">本月待办({{ monthCompNum }}/{{ monthList.length }})</span>
-          <TabsList :current-todo="2" :table-data="monthList" />
+          <TabsList :current-todo="2" :table-data="monthList" @successHandle="initEventList" />
         </el-tab-pane>
         <el-tab-pane label="今年待办" name="yearlist"> <span slot="label">今年待办({{ yearCompNum }}/{{ yearList.length }})</span>
-          <TabsList :current-todo="3" :table-data="yearList" />
+          <TabsList :current-todo="3" :table-data="yearList" @successHandle="initEventList" />
         </el-tab-pane>
         <el-tab-pane label="未提交待办" name="uncommits"> <span slot="label">未提交待办({{ uncommits.length }})</span>
-          <UncommitList :un-commit-data="uncommits" />
+          <UncommitList :un-commit-data="uncommits" @successHandle="initEventList" />
         </el-tab-pane>
       </el-tabs>
     </el-card>
@@ -85,6 +85,10 @@ export default {
   },
   methods: {
     handleClick(tab) {
+    },
+    initEventList() {
+      // 监听到子组件操作的事件，父组件重新渲染数据
+      this.initEventData()
     },
     async initEventData() {
       const result = await queryEvent()
