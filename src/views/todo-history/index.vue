@@ -209,7 +209,7 @@ export default {
     },
     async searchHandle() {
       this.currentSecTime = this.queryForm.time
-      this.queryForm.time = this.queryForm.dateType === '1' ? this.queryForm.time + ' 00:00:00' : this.queryForm.time
+      this.queryForm.time = this.queryForm.dateType === '1' && this.queryForm.time.indexOf('00:00:00') === -1 ? this.queryForm.time + ' 00:00:00' : this.queryForm.time
 
       this.todoLoading = true
       console.log({ ...this.queryForm })
