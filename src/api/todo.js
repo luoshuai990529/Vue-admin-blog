@@ -8,10 +8,11 @@ export function createEvent(data) {
   })
 }
 
-export function queryEvent() {
+export function queryEvent(params) {
   return request({
     url: '/todo/list',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
@@ -39,3 +40,10 @@ export function deleteEvent(id) {
   })
 }
 
+export function commitEvent(data) {
+  return request({
+    url: '/todo/commit',
+    method: 'post',
+    data
+  })
+}

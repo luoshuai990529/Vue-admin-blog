@@ -6,7 +6,7 @@
           {{ item.start_time }} 至 {{ item.end_time }} <el-tag effect="dark" size="mini" :type="getTagsType(item.date_type)" style="margin-left:20px">{{ formatTitle(item.date_type) }}</el-tag>
         </template>
         <div v-if="item.list.length>0">
-          <TabsList :hidebtn="false" :current-todo="item.id" :table-data="item.list" @successHandle="successHandle" />
+          <TabsList :hidecommit="false" :hidebtn="false" :current-todo="item.id" :table-data="item.list" @successHandle="successHandle" />
         </div>
       </el-collapse-item>
     </el-collapse>

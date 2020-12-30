@@ -14,7 +14,7 @@
         <el-tab-pane label="今年待办" name="yearlist"> <span slot="label">今年待办({{ yearCompNum }}/{{ yearList.length }})</span>
           <TabsList :current-todo="3" :table-data="yearList" @successHandle="initEventList" />
         </el-tab-pane>
-        <el-tab-pane label="未提交待办" name="uncommits"> <span slot="label">未提交待办({{ uncommits.length }})</span>
+        <el-tab-pane label="过时未提交待办" name="uncommits"> <span slot="label">过时未提交待办({{ uncommits.length }})</span>
           <UncommitList :un-commit-data="uncommits" @successHandle="initEventList" />
         </el-tab-pane>
       </el-tabs>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { queryEvent } from '@/api/todo'
 import TabsList from './TabsList.vue'
 import UncommitList from './UncommitList.vue'
@@ -43,6 +44,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['userId']),
     dayCompNum() {
       let count = 0
       this.dayList.forEach(item => {
@@ -91,7 +93,7 @@ export default {
       this.initEventData()
     },
     async initEventData() {
-      const result = await queryEvent()
+      const result = await queryEvent({ uid: this.userId })
       this.dayList = result.data.dayList
       this.weekList = result.data.weekList
       this.monthList = result.data.monthList

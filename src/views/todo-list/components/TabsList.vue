@@ -1,7 +1,7 @@
 <template>
   <div class="list-container">
     <div class="clearfix">
-      <el-button type="primary" size="small" style="float:right" @click="commitHandle">提交待办</el-button>
+      <el-button v-if="!hidecommit" :disabled="tableData.length===0" type="primary" size="small" style="float:right" @click="commitHandle">提交待办</el-button>
     </div>
     <!-- 进行中的事件 -->
     <div class="pending">
@@ -123,7 +123,9 @@
 </template>
 
 <script>
-import { completeEvent, cancleEvent, deleteEvent } from '@/api/todo'
+import { mapGetters } from 'vuex'
+import { parseTime, getWeekStartDateAndEndDateRange, getMonthStartDateAndDateRange, getYearStartDateAndDateRange } from '@/utils/index'
+import { completeEvent, cancleEvent, deleteEvent, commitEvent } from '@/api/todo'
 export default {
   name: 'TabsList',
   props: {
@@ -140,12 +142,17 @@ export default {
     hidebtn: {
       type: Boolean,
       default: true
+    },
+    hidecommit: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
     return {
       allTableData: [],
       commitDialog: false,
+      start_time: '',
       addTodoData: {
         remarks: '',
         mood: 0
@@ -153,6 +160,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['userId']),
     getCompleteData() {
       const completeArr = []
       this.tableData.forEach(item => {
@@ -188,10 +196,43 @@ export default {
       this.successHandle(result.message)
     },
     commitHandle() {
-      this.commitDialog = true
-      console.log('当前提交的todo标识：', this.currentTodo)
+      this.addTodoData.remarks = ''
+      if (this.tableData.length === 0) {
+        this.$message({
+          type: 'info',
+          message: '当前没有可提交的待办事项~'
+        })
+      } else {
+        this.commitDialog = true
+        const dayTime = parseTime(new Date(new Date().toLocaleDateString()).getTime(), '{y}-{m}-{d} {h}:{i}:{s}')
+        const weekTime = parseTime(getWeekStartDateAndEndDateRange()[0], '{y}-{m}-{d} {h}:{i}:{s}')
+        const monthTime = parseTime(getMonthStartDateAndDateRange()[0], '{y}-{m}-{d} {h}:{i}:{s}')
+        const yearTime = parseTime(getYearStartDateAndDateRange()[0], '{y}-{m}-{d} {h}:{i}:{s}')
+        switch (this.currentTodo) {
+          case 0:
+            this.start_time = dayTime
+            break
+          case 1:
+            this.start_time = weekTime
+            break
+          case 2:
+            this.start_time = monthTime
+            break
+          case 3:
+            this.start_time = yearTime
+            break
+          default:
+            this.start_time = ''
+            break
+        }
+      }
     },
-    sureAddEvent() {},
+    async sureAddEvent() {
+      const data = { ...this.addTodoData, id: this.currentTodo, start_time: this.start_time, uid: this.userId }
+      const result = await commitEvent(data)
+      this.commitDialog = false
+      this.successHandle(result.message)
+    },
     successHandle(message) {
       this.$message({
         type: 'success',

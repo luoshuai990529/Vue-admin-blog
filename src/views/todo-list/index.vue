@@ -60,6 +60,7 @@
 <script>
 import { createEvent } from '@/api/todo'
 import { parseTime } from '@/utils/index'
+import { mapGetters } from 'vuex'
 import TodoTabs from './components/TodoTabs.vue'
 export default {
   components: {
@@ -78,6 +79,9 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(['userId'])
+  },
   methods: {
     addNewTodo() {
       this.addTodoData.description = ''
@@ -86,7 +90,7 @@ export default {
     },
     async sureAddEvent() {
       this.addNewDialog = false
-      const result = await createEvent(this.addTodoData)
+      const result = await createEvent({ ...this.addTodoData, uid: this.userId })
       if (result.code === 200) {
         this.$message({
           message: result.message,

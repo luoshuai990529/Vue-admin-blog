@@ -115,3 +115,35 @@ export function param2Obj(url) {
   })
   return obj
 }
+
+// 获取当前周 周一和周日的日期
+export function getWeekStartDateAndEndDateRange() {
+  const oneDayLong = 24 * 60 * 60 * 1000
+  const now = new Date()
+  const mondayTime = new Date(now.toLocaleDateString()).getTime() - (now.getDay() - 1) * oneDayLong
+  const sundayTime = new Date(now.toLocaleDateString()).getTime() + (8 - now.getDay()) * oneDayLong - 1000
+  const monday = new Date(mondayTime)
+  const sunday = new Date(sundayTime)
+  const weekRange = [monday, sunday]
+  return weekRange
+}
+// 获取当前月 起始日和结束日的日期
+export function getMonthStartDateAndDateRange() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const monthStartDate = new Date(year, now.getMonth(), 1)// 当前月1号
+  const nextMonthStartDate = new Date(year, now.getMonth() + 1, 1)// 下个月1号
+  // const days = new Date(year, now.getMonth() + 1, 0).getDate(); // 计算当前月份的天数
+  const monthEndDate = nextMonthStartDate.getTime() - 1000 // 月底最后一天 23:59:59
+  const monthRange = [monthStartDate, monthEndDate]
+  return monthRange
+}
+// 获取当前年 起始日和结束日的日期
+export function getYearStartDateAndDateRange() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const yearStartTime = new Date(new Date(year, 0, 1).toLocaleDateString()).getTime()
+  const yearEndTime = new Date(new Date(year + 1, 0, 1).toLocaleDateString()).getTime() - 1000
+  const yearRange = [yearStartTime, yearEndTime]
+  return yearRange
+}
