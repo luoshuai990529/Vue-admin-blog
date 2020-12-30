@@ -14,7 +14,7 @@
         <el-tab-pane label="今年待办" name="yearlist"> <span slot="label">今年待办({{ yearCompNum }}/{{ yearList.length }})</span>
           <TabsList :current-todo="3" :table-data="yearList" @successHandle="initEventList" />
         </el-tab-pane>
-        <el-tab-pane label="过时未提交待办" name="uncommits"> <span slot="label">过时未提交待办({{ uncommits.length }})</span>
+        <el-tab-pane label="待提交待办项" name="uncommits"> <span slot="label">待提交待办项( {{ uncommits.length }} )</span>
           <UncommitList :un-commit-data="uncommits" @successHandle="initEventList" />
         </el-tab-pane>
       </el-tabs>

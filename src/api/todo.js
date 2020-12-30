@@ -47,3 +47,19 @@ export function commitEvent(data) {
     data
   })
 }
+
+export function queryEventByDate(params) {
+  return request({
+    url: '/todo/queryEventByDate',
+    method: 'get',
+    params
+  })
+}
+
+export function changeOpen(data) {
+  return request({
+    url: '/todo/isopen',
+    method: 'post',
+    data
+  })
+}

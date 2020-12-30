@@ -95,6 +95,7 @@
 
 <script>
 import { parseTime } from '@/utils/index'
+import { queryEventByDate, changeOpen } from '@/api/todo'
 export default {
   data() {
     return {
@@ -142,13 +143,13 @@ export default {
     getPickerFormat() {
       switch (this.queryForm.dateType) {
         case '0':
-          return 'yyyy-MM-dd'
+          return 'yyyy-MM-dd HH:mm:ss'
         case '1':
           return ''
         case '2':
-          return 'yyyy-MM'
+          return 'yyyy-MM-dd HH:mm:ss'
         case '3':
-          return 'yyyy'
+          return 'yyyy-MM-dd HH:mm:ss'
         default:
           return 'date'
       }
@@ -196,9 +197,6 @@ export default {
       }
     }
   },
-  mounted() {
-
-  },
   methods: {
     secHandle() {
       this.queryForm.time = ''
@@ -209,35 +207,61 @@ export default {
         this.queryForm.time = time
       }
     },
-    searchHandle() {
+    async searchHandle() {
       this.currentSecTime = this.queryForm.time
-      console.log({ ...this.queryForm })
+      this.queryForm.time = this.queryForm.dateType === '1' ? this.queryForm.time + ' 00:00:00' : this.queryForm.time
+
       this.todoLoading = true
-      setTimeout(() => {
-        const data = {
-          id: 1,
-          start_time: '2020-12-01',
-          end_time: '2020-12-30',
-          data_type: '2',
-          commit: '1',
-          mood: '0',
-          moodImg: '😀',
-          remarks: '还不错',
-          todoHistoryData: [
-            { id: 1, priority: '2', description: '学完typescript', open: '1', openDesc: '是', tags: '学习', complete: '0', completeDesc: '未完成' },
-            { id: 2, priority: '2', description: '学完flutter', open: '1', openDesc: '是', tags: '学习', complete: '1', completeDesc: '已完成' },
-            { id: 3, priority: '2', description: '学完react-native', open: '0', openDesc: '否', tags: '学习', complete: '1', completeDesc: '已完成' }
-          ] }
-        // this.searchData.todoHistoryData = []
-        this.searchData = data
-        this.todoLoading = false
-      }, 1000)
+      console.log({ ...this.queryForm })
+      const result = await queryEventByDate(this.queryForm)
+      this.todoLoading = false
+      if (result.data.length > 0) {
+        this.searchData.remarks = result.data[0].remarks
+        switch (result.data[0].mood) {
+          case '0':
+            this.searchData.moodImg = '😀'
+            break
+          case '1':
+            this.searchData.moodImg = '😌'
+            break
+          case '2':
+            this.searchData.moodImg = '😠'
+            break
+          case '3':
+            this.searchData.moodImg = '🙃'
+            break
+          case '4':
+            this.searchData.moodImg = '😵'
+            break
+          default:
+            break
+        }
+        this.searchData.todoHistoryData = result.data
+      } else {
+        this.searchData.moodImg = ''
+        this.searchData.remarks = ''
+        this.searchData.todoHistoryData = []
+      }
     },
-    hideHandle() {
-
+    async hideHandle({ id, open }) {
+      const result = await changeOpen({ id, open })
+      if (result.code === 200) {
+        this.$message({
+          type: 'success',
+          message: result.message
+        })
+        this.searchHandle()
+      }
     },
-    showHandle() {
-
+    async showHandle({ id, open }) {
+      const result = await changeOpen({ id, open })
+      if (result.code === 200) {
+        this.$message({
+          type: 'success',
+          message: result.message
+        })
+        this.searchHandle()
+      }
     }
 
   }
